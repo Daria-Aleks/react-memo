@@ -6,6 +6,7 @@ import { EndGameModal } from "../../components/EndGameModal/EndGameModal";
 import { Button } from "../../components/Button/Button";
 import { Card } from "../../components/Card/Card";
 import { useCount } from "../hooks/useCount";
+import { useLeader } from "../hooks/useLeader";
 // Игра закончилась
 const STATUS_LOST = "STATUS_LOST";
 const STATUS_WON = "STATUS_WON";
@@ -29,9 +30,11 @@ function getTimerValue(startDate, endDate) {
   const diffInSecconds = Math.floor((endDate.getTime() - startDate.getTime()) / 1000);
   const minutes = Math.floor(diffInSecconds / 60);
   const seconds = diffInSecconds % 60;
+  const col = minutes * 60 + seconds;
   return {
     minutes,
     seconds,
+    col,
   };
 }
 /**
@@ -48,7 +51,8 @@ export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }
   // Текущий статус игры
   const { lite } = useCount();
   const [status, setStatus] = useState(STATUS_PREVIEW);
-
+  const [isLeader, setIsLeader] = useState(false);
+  const { getLeaders, leaderBoard } = useLeader();
   // Дата начала игры
   const [gameStartDate, setGameStartDate] = useState(null);
   // Дата конца игры
@@ -58,6 +62,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }
   const [timer, setTimer] = useState({
     seconds: 0,
     minutes: 0,
+    col: 0,
   });
 
   function finishGame(status = STATUS_LOST) {
@@ -125,6 +130,14 @@ export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }
       if (lite) {
         if (lostCount < 3) {
           finishGame(STATUS_WON);
+          const sortedData = [...leaderBoard, timer].sort((a, b) => a.col - b.col);
+          let index = sortedData.indexOf(timer);
+          getLeaders(sortedData);
+          if (index <= 9) {
+            setIsLeader(true);
+          } else {
+            setIsLeader(false);
+          }
           return;
         }
       } else {
@@ -162,6 +175,9 @@ export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }
 
   const isGameEnded = status === STATUS_LOST || status === STATUS_WON;
 
+  useEffect(() => {
+    localStorage.setItem("leaderBoard", JSON.stringify(leaderBoard));
+  }, [leaderBoard]);
   // Игровой цикл
   useEffect(() => {
     // В статусах кроме превью доп логики не требуется
@@ -244,6 +260,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }
             gameDurationSeconds={timer.seconds}
             gameDurationMinutes={timer.minutes}
             onClick={resetGame}
+            isLeader={isLeader}
           />
         </div>
       ) : null}
