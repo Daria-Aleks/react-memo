@@ -59,6 +59,23 @@
   text-decoration: none;
 }
 
+.easy{
+  color:blueviolet;
+  font-family:monospace;
+  font-size: 24px;
+  
+}
+
+.easy:hover{
+  color:black;
+  text-decoration: underline;
+}
+
+.check{
+  display: flex;
+  margin-left: 70px;
+}
+
 .levelLink:visited {
   color: #0080c1;
 }
