@@ -6,10 +6,12 @@ export function LeaderBoard() {
 
   return (
     <>
-      <p>LeaderBoard</p>
-      <Link to={"/"}>Начать игру</Link>
+      <p className={styles.titleLeaderbord}>LeaderBoard</p>
+      <Link to={"/"} className={styles.startLink}>
+        Начать игру
+      </Link>
       {leaderBoard.map((time, index) => (
-        <li key={index}>
+        <li key={index} className={styles.ul}>
           <p className={styles.h5}>
             Минуты: {time.minutes}, Секунды: {time.seconds}, пользователь: {user}
           </p>

@@ -21,14 +21,16 @@ export function EndGameModal({ isWon, gameDurationSeconds, gameDurationMinutes, 
     <div className={styles.modal}>
       <img className={styles.image} src={imgSrc} alt={imgAlt} />
       <h2 className={styles.title}>{title}</h2>
-      <input placeholder="Пользователь" onChange={handleInputChange}></input>
+      <input placeholder="Пользователь" onChange={handleInputChange} className={styles.inputName}></input>
       <p className={styles.description}>Затраченное время:</p>
       <div className={styles.time}>
         {gameDurationMinutes.toString().padStart("2", "0")}.{gameDurationSeconds.toString().padStart("2", "0")}
       </div>
 
       <Button onClick={onClick}>Начать сначала</Button>
-      <Link to="/leaderboard">Перейти к лидерборду</Link>
+      <Link to="/leaderboard" className={styles.linkLeader}>
+        Перейти к лидерборду
+      </Link>
     </div>
   );
 }

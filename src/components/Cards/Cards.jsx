@@ -132,7 +132,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }
           finishGame(STATUS_WON);
           const sortedData = [...leaderBoard, timer].sort((a, b) => a.col - b.col);
           let index = sortedData.indexOf(timer);
-          getLeaders(sortedData);
+          getLeaders(sortedData.slice(0, 9));
           if (index <= 9) {
             setIsLeader(true);
           } else {
