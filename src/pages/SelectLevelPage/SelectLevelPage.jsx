@@ -30,7 +30,12 @@ export function SelectLevelPage() {
         </ul>
         <div>
           <p className={styles.easy}>Легкий режим</p>
-          <input className={styles.check} type="checkbox" checked={lite} onChange={changeInputValue}></input>
+          <div className="checkbox">
+            <label>
+              <input className={styles.check} type="checkbox" checked={lite} onChange={changeInputValue}></input>
+              <span className={styles.customCheckbox}></span>
+            </label>
+          </div>
         </div>
       </div>
     </div>

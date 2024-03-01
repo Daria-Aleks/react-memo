@@ -72,8 +72,24 @@
 }
 
 .check{
-  display: flex;
-  margin-left: 70px;
+  display: none;
+}
+
+
+.customCheckbox {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 1px solid #8304b9;
+  cursor: pointer;
+  border-radius:8px;
+  margin-left: 65px;
+  margin-top: 15px;
+}
+
+.check:checked + .customCheckbox{
+  background-color: #8304b9;
+  border-color: #8304b9;
 }
 
 .levelLink:visited {
