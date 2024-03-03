@@ -84,8 +84,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }
     setTimer(getTimerValue(null, null));
     setStatus(STATUS_PREVIEW);
   }
-
-  /**
+  /*
    * Обработка основного действия в игре - открытие карты.
    * После открытия карты игра может пепереходит в следующие состояния
    * - "Игрок выиграл", если на поле открыты все карты
@@ -159,11 +158,13 @@ export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }
 
       return false;
     });
+    // setCards(cards.map(card => (openCardsWithoutPair.includes(card) ? { ...card, open: false } : card)));
 
     const playerLost = openCardsWithoutPair.length >= 2;
 
     // "Игрок проиграл", т.к на поле есть две открытые карты без пары
     if (playerLost) {
+      setCards(cards.map(card => (openCardsWithoutPair.includes(card) ? { ...card, open: false } : card)));
       if (!lite) {
         finishGame(STATUS_LOST);
         return;
