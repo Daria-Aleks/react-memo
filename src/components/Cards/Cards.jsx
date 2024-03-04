@@ -151,6 +151,9 @@ export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }
 
     // "Игрок проиграл", т.к на поле есть две открытые карты без пары
     if (playerLost) {
+      setTimeout(() => {
+        setCards(cards.map(card => (openCardsWithoutPair.includes(card) ? { ...card, open: false } : card)));
+      }, 1000);
       if (!lite) {
         finishGame(STATUS_LOST);
         return;
