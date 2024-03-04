@@ -44,6 +44,7 @@ function getTimerValue(startDate, endDate) {
  */
 export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }) {
   // console.log(count, getCount);
+  const { user } = useLeader();
   // В cards лежит игровое поле - массив карт и их состояние открыта\закрыта
   const [cards, setCards] = useState([]);
   const [prevCard, setPrevCard] = useState(null);
@@ -131,7 +132,6 @@ export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }
           finishGame(STATUS_WON);
           const sortedData = [...leaderBoard, timer].sort((a, b) => a.col - b.col);
           let index = sortedData.indexOf(timer);
-          getLeaders(sortedData.slice(0, 9));
           if (index <= 9) {
             setIsLeader(true);
           } else {
@@ -164,7 +164,9 @@ export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }
 
     // "Игрок проиграл", т.к на поле есть две открытые карты без пары
     if (playerLost) {
-      setCards(cards.map(card => (openCardsWithoutPair.includes(card) ? { ...card, open: false } : card)));
+      setTimeout(() => {
+        setCards(cards.map(card => (openCardsWithoutPair.includes(card) ? { ...card, open: false } : card)));
+      }, 1000);
       if (!lite) {
         finishGame(STATUS_LOST);
         return;
@@ -214,7 +216,34 @@ export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }
       clearInterval(intervalId);
     };
   }, [gameStartDate, gameEndDate]);
-
+  const time = () => {
+    let time = timer;
+    time["user"] = user;
+    const sortedData = [...leaderBoard, timer].sort((a, b) => a.col - b.col);
+    console.log(sortedData);
+    let index = sortedData.indexOf(timer);
+    getLeaders(sortedData.slice(0, 9));
+    if (index <= 9) {
+      setIsLeader(true);
+    } else {
+      setIsLeader(false);
+    }
+  };
+  // useEffect(() => {
+  //   if (user.length) {
+  //     let time = timer;
+  //     time["user"] = user;
+  //     const sortedData = [...leaderBoard, timer].sort((a, b) => a.col - b.col);
+  //     console.log(sortedData);
+  //     let index = sortedData.indexOf(timer);
+  //     getLeaders(sortedData.slice(0, 9));
+  //     if (index <= 9) {
+  //       setIsLeader(true);
+  //     } else {
+  //       setIsLeader(false);
+  //     }
+  //   }
+  // }, [user]);
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -262,6 +291,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }
             gameDurationMinutes={timer.minutes}
             onClick={resetGame}
             isLeader={isLeader}
+            timeFunc={time}
           />
         </div>
       ) : null}
