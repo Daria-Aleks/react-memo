@@ -8,19 +8,19 @@
 
 .titleLeaderbord {
   display: flex;
-  justify-content: center;
-  padding-top: 40px;
-  color: black;
-  font-family: cursive;
-  font-size: 40px;
+  color: rgb(255, 255, 255);
+  font-size: 23px;  
+  font-family: StratosSkyeng;
+  font-weight: 200;
 }
 
 .startLink {
   display: flex;
   justify-content: center;
   color: azure;
-  font-family: cursive;
-  font-size: 30px;
+  font-family: StratosSkyeng;
+  font-size: 23px;
+  text-decoration: none
 }
 
 .ul {
@@ -29,4 +29,45 @@
   font-size: 20px;
   padding-top: 40px;
   color: white;
+}
+
+.wrapperHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 20px 0;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  padding: 0 30px;
+}
+
+.tr, .trBody {
+  background: white;
+  color: gray;
+  font-family: StratosSkyeng;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.trBody {
+  color: black
+}
+
+table {
+  width: 100%;
+}
+
+.startBtn {
+  background: #9ed870;
+  font-family: StratosSkyeng;
+  border-radius: 10px;
+  border: none; 
+  outline: none;
+  padding: 5px;
 }

@@ -45,6 +45,7 @@ function getTimerValue(startDate, endDate) {
 export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }) {
   // console.log(count, getCount);
   const { user } = useLeader();
+  // const [boards, setBoard] = useState(null);
   // В cards лежит игровое поле - массив карт и их состояние открыта\закрыта
   const [cards, setCards] = useState([]);
   const [prevCard, setPrevCard] = useState(null);
@@ -53,11 +54,13 @@ export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }
   const { lite } = useCount();
   const [status, setStatus] = useState(STATUS_PREVIEW);
   const [isLeader, setIsLeader] = useState(false);
-  const { getLeaders, leaderBoard } = useLeader();
+  const { leaderBoard } = useLeader();
   // Дата начала игры
   const [gameStartDate, setGameStartDate] = useState(null);
   // Дата конца игры
   const [gameEndDate, setGameEndDate] = useState(null);
+  // const [isPaused, setIsPaused] = useState(false);
+  // const [isUsed, setIsUsed] = useState(false);
 
   // Стейт для таймера, высчитывается в setInteval на основе gameStartDate и gameEndDate
   const [timer, setTimer] = useState({
@@ -92,6 +95,19 @@ export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }
    * - "Игрок проиграл", если на поле есть две открытые карты без пары
    * - "Игра продолжается", если не случилось первых двух условий
    */
+
+  // function showCards() {
+  //   if (!isUsed) {
+  //     setIsUsed(true);
+  //     setIsPaused(true);
+  //     const prevCards = cards;
+  //     setCards(cards.map(card => ({ ...card, open: true })));
+  //     setTimeout(() => {
+  //       setCards(prevCards);
+  //       setIsPaused(false);
+  //     }, 5000);
+  //   }
+  // }
   const openCard = clickedCard => {
     setCount(!count);
     if (lite) {
@@ -130,12 +146,16 @@ export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }
       if (lite) {
         if (lostCount < 3) {
           finishGame(STATUS_WON);
-          const sortedData = [...leaderBoard, timer].sort((a, b) => a.col - b.col);
-          let index = sortedData.indexOf(timer);
-          if (index <= 9) {
-            setIsLeader(true);
-          } else {
-            setIsLeader(false);
+          if (cards.length) {
+            console.log(leaderBoard);
+            const sortedData = [...leaderBoard, timer].sort((a, b) => a.time - b.time);
+            console.log(sortedData);
+            let index = sortedData.indexOf(timer);
+            if (index <= 9) {
+              setIsLeader(true);
+            } else {
+              setIsLeader(false);
+            }
           }
           return;
         }
@@ -164,9 +184,6 @@ export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }
 
     // "Игрок проиграл", т.к на поле есть две открытые карты без пары
     if (playerLost) {
-      setTimeout(() => {
-        setCards(cards.map(card => (openCardsWithoutPair.includes(card) ? { ...card, open: false } : card)));
-      }, 1000);
       if (!lite) {
         finishGame(STATUS_LOST);
         return;
@@ -178,9 +195,6 @@ export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }
 
   const isGameEnded = status === STATUS_LOST || status === STATUS_WON;
 
-  useEffect(() => {
-    localStorage.setItem("leaderBoard", JSON.stringify(leaderBoard));
-  }, [leaderBoard]);
   // Игровой цикл
   useEffect(() => {
     // В статусах кроме превью доп логики не требуется
@@ -209,6 +223,10 @@ export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }
 
   // Обновляем значение таймера в интервале
   useEffect(() => {
+    // if (isPaused) {
+    //   console.log("yes");
+    //   return;
+    // }
     const intervalId = setInterval(() => {
       setTimer(getTimerValue(gameStartDate, gameEndDate));
     }, 300);
@@ -216,34 +234,28 @@ export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }
       clearInterval(intervalId);
     };
   }, [gameStartDate, gameEndDate]);
-  const time = () => {
-    let time = timer;
-    time["user"] = user;
-    const sortedData = [...leaderBoard, timer].sort((a, b) => a.col - b.col);
-    console.log(sortedData);
-    let index = sortedData.indexOf(timer);
-    getLeaders(sortedData.slice(0, 9));
-    if (index <= 9) {
-      setIsLeader(true);
-    } else {
-      setIsLeader(false);
-    }
+  const time = async () => {
+    let response = await fetch(" https://wedev-api.sky.pro/api/leaderboard", {
+      method: "POST",
+      body: JSON.stringify({
+        name: user,
+        time: timer.col,
+      }),
+    });
+    let result = await response.json();
+    console.log(result);
+    // let time = timer;
+    // time["user"] = user;
+    // const sortedData = [...leaderBoard, timer].sort((a, b) => a.col - b.col);
+    // console.log(sortedData);
+    // let index = sortedData.indexOf(timer);
+    // getLeaders(sortedData.slice(0, 9));
+    // if (index <= 9) {
+    //   setIsLeader(true);
+    // } else {
+    //   setIsLeader(false);
+    // }
   };
-  // useEffect(() => {
-  //   if (user.length) {
-  //     let time = timer;
-  //     time["user"] = user;
-  //     const sortedData = [...leaderBoard, timer].sort((a, b) => a.col - b.col);
-  //     console.log(sortedData);
-  //     let index = sortedData.indexOf(timer);
-  //     getLeaders(sortedData.slice(0, 9));
-  //     if (index <= 9) {
-  //       setIsLeader(true);
-  //     } else {
-  //       setIsLeader(false);
-  //     }
-  //   }
-  // }, [user]);
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -269,7 +281,9 @@ export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }
         </div>
         {status === STATUS_IN_PROGRESS ? <Button onClick={resetGame}>Начать заново</Button> : null}
       </div>
-
+      {/* <p className={styles.show} onClick={showCards}>
+        Прозрение
+      </p> */}
       <div className={styles.cards}>
         {cards.map(card => (
           <Card

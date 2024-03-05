@@ -1,18 +1,15 @@
 import styles from "./EndGameModal.module.css";
-
 import { Button } from "../Button/Button";
 import { useLeader } from "../hooks/useLeader";
 import deadImageUrl from "./images/dead.png";
 import celebrationImageUrl from "./images/celebration.png";
 import { Link } from "react-router-dom";
-import { useCount } from "../hooks/useCount";
 export function EndGameModal({ isWon, gameDurationSeconds, gameDurationMinutes, onClick, isLeader, timeFunc }) {
   const title = isLeader ? "Вы попали на Лидерборд!" : isWon ? "Вы победили!" : "Вы проиграли!";
   const imgSrc = isWon ? celebrationImageUrl : deadImageUrl;
 
   const imgAlt = isWon ? "celebration emodji" : "dead emodji";
   const { getUser } = useLeader();
-  const { lite } = useCount();
   function handleInputChange(e) {
     const { value } = e.target;
     getUser(value);
@@ -26,7 +23,7 @@ export function EndGameModal({ isWon, gameDurationSeconds, gameDurationMinutes, 
     <div className={styles.modal}>
       <img className={styles.image} src={imgSrc} alt={imgAlt} />
       <h2 className={styles.title}>{title}</h2>
-      {lite && isLeader ? (
+      {isLeader ? (
         <input placeholder="Пользователь" onChange={handleInputChange} className={styles.inputName}></input>
       ) : (
         ""
