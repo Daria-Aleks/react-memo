@@ -14,7 +14,7 @@ const STATUS_WON = "STATUS_WON";
 const STATUS_IN_PROGRESS = "STATUS_IN_PROGRESS";
 // Начало игры: игрок видит все карты в течении нескольких секунд
 const STATUS_PREVIEW = "STATUS_PREVIEW";
-
+let pauseDuration = 0;
 function getTimerValue(startDate, endDate) {
   if (!startDate && !endDate) {
     return {
@@ -27,7 +27,7 @@ function getTimerValue(startDate, endDate) {
     endDate = new Date();
   }
 
-  const diffInSecconds = Math.floor((endDate.getTime() - startDate.getTime()) / 1000);
+  const diffInSecconds = Math.floor((endDate.getTime() - startDate.getTime() - pauseDuration) / 1000);
   const minutes = Math.floor(diffInSecconds / 60);
   const seconds = diffInSecconds % 60;
   const col = minutes * 60 + seconds;
@@ -59,8 +59,8 @@ export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }
   const [gameStartDate, setGameStartDate] = useState(null);
   // Дата конца игры
   const [gameEndDate, setGameEndDate] = useState(null);
-  // const [isPaused, setIsPaused] = useState(false);
-  // const [isUsed, setIsUsed] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [isUsed, setIsUsed] = useState(false);
 
   // Стейт для таймера, высчитывается в setInteval на основе gameStartDate и gameEndDate
   const [timer, setTimer] = useState({
@@ -77,12 +77,14 @@ export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }
   }
   function startGame() {
     const startDate = new Date();
+    pauseDuration = 0;
     setGameEndDate(null);
     setGameStartDate(startDate);
     setTimer(getTimerValue(startDate, null));
     setStatus(STATUS_IN_PROGRESS);
   }
   function resetGame() {
+    pauseDuration = 0;
     setGameStartDate(null);
     setGameEndDate(null);
     setTimer(getTimerValue(null, null));
@@ -96,18 +98,19 @@ export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }
    * - "Игра продолжается", если не случилось первых двух условий
    */
 
-  // function showCards() {
-  //   if (!isUsed) {
-  //     setIsUsed(true);
-  //     setIsPaused(true);
-  //     const prevCards = cards;
-  //     setCards(cards.map(card => ({ ...card, open: true })));
-  //     setTimeout(() => {
-  //       setCards(prevCards);
-  //       setIsPaused(false);
-  //     }, 5000);
-  //   }
-  // }
+  function showCards() {
+    if (!isUsed) {
+      setIsUsed(true);
+      setIsPaused(true);
+      const prevCards = cards;
+      pauseDuration = 5000;
+      setCards(cards.map(card => ({ ...card, open: true })));
+      setTimeout(() => {
+        setCards(prevCards);
+        setIsPaused(false);
+      }, 5000);
+    }
+  }
   const openCard = clickedCard => {
     setCount(!count);
     if (lite) {
@@ -223,38 +226,35 @@ export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }
 
   // Обновляем значение таймера в интервале
   useEffect(() => {
-    // if (isPaused) {
-    //   console.log("yes");
-    //   return;
-    // }
+    if (isPaused) {
+      console.log("yes");
+      return;
+    }
     const intervalId = setInterval(() => {
       setTimer(getTimerValue(gameStartDate, gameEndDate));
     }, 300);
     return () => {
       clearInterval(intervalId);
     };
-  }, [gameStartDate, gameEndDate]);
+  }, [gameStartDate, gameEndDate, isPaused]);
   const time = async () => {
-    let response = await fetch(" https://wedev-api.sky.pro/api/leaderboard", {
+    let achievements = [];
+    if (!isUsed) {
+      achievements.push(1);
+    }
+    if (cards.length === 18) {
+      achievements.push(2);
+    }
+    let response = await fetch("https://wedev-api.sky.pro/api/v2/leaderboard", {
       method: "POST",
       body: JSON.stringify({
         name: user,
         time: timer.col,
+        achievements: achievements,
       }),
     });
     let result = await response.json();
     console.log(result);
-    // let time = timer;
-    // time["user"] = user;
-    // const sortedData = [...leaderBoard, timer].sort((a, b) => a.col - b.col);
-    // console.log(sortedData);
-    // let index = sortedData.indexOf(timer);
-    // getLeaders(sortedData.slice(0, 9));
-    // if (index <= 9) {
-    //   setIsLeader(true);
-    // } else {
-    //   setIsLeader(false);
-    // }
   };
   return (
     <div className={styles.container}>
@@ -278,12 +278,16 @@ export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }
               </div>
             </>
           )}
+          {status === STATUS_IN_PROGRESS ? (
+            <p onClick={showCards}>
+              <img className={styles.show} src="../images/see.png"></img>
+            </p>
+          ) : (
+            ""
+          )}
         </div>
         {status === STATUS_IN_PROGRESS ? <Button onClick={resetGame}>Начать заново</Button> : null}
       </div>
-      {/* <p className={styles.show} onClick={showCards}>
-        Прозрение
-      </p> */}
       <div className={styles.cards}>
         {cards.map(card => (
           <Card

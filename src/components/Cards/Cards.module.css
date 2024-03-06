@@ -30,6 +30,7 @@
   justify-content: space-between;
   align-items: end;
   margin-bottom: 35px;
+  align-items: center;
 }
 
 .timer {
@@ -80,6 +81,7 @@
 
 .show {
   color: white; 
-  font-size: 24px;
-  margin-bottom: 30px;
+  margin: 0 40px;
+  width: 100px;
+  height: 100px;
 }

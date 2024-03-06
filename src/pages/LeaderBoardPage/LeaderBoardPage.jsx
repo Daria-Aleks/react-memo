@@ -5,7 +5,7 @@ export function LeaderBoard() {
   const [boards, setBoard] = useState(null);
   const [resBoard, setResBoard] = useState(null);
   async function getLeadersFromServe() {
-    let response = await fetch("https://wedev-api.sky.pro/api/leaderboard");
+    let response = await fetch("https://wedev-api.sky.pro/api/v2/leaderboard");
     if (response.ok) {
       await response.json().then(response => setBoard(response.leaders));
     }
@@ -32,18 +32,29 @@ export function LeaderBoard() {
           <tr className={styles.tr}>
             <div>Позиция</div>
             <div>Пользователь</div>
+            <div>Достижения</div>
             <div>Время</div>
           </tr>
         </thead>
         <tbody>
           {resBoard?.map((time, index) => (
-            <tr key={index} className={styles.trBody}>
+            <div key={index} className={styles.trBody}>
               <td># {index + 1}</td>
               <td>{time.name}</td>
               <td>
+                <img
+                  src={time.achievements[0] === 1 ? "./images/1.png" : "./images/1-1.png"}
+                  className={styles.img}
+                ></img>
+                <img
+                  src={time.achievements[1] === 2 ? "./images/2.png" : "./images/2-1.png"}
+                  className={styles.img}
+                ></img>
+              </td>
+              <td>
                 {time.minutes}:{time.seconds > 9 ? time.seconds : "0" + time.seconds}
               </td>
-            </tr>
+            </div>
           ))}
         </tbody>
       </table>
