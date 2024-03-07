@@ -47,7 +47,7 @@ export function LeaderBoard() {
                   className={styles.img}
                 ></img>
                 <img
-                  src={time.achievements[1] === 2 ? "./images/2.png" : "./images/2-1.png"}
+                  src={time.achievements[1] === 2 || time.achievements[0] === 2 ? "./images/2.png" : "./images/2-1.png"}
                   className={styles.img}
                 ></img>
               </td>

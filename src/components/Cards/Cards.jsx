@@ -117,6 +117,10 @@ export function Cards({ pairsCount = 3, previewSeconds = 5, lostCount, getLost }
       if (count) {
         if (prevCard?.suit !== clickedCard.suit || prevCard?.rank !== clickedCard.rank) {
           getLost(++lostCount);
+          setTimeout(
+            () => setCards(cards.map(card => (openCardsWithoutPair.includes(card) ? { ...card, open: false } : card))),
+            2000,
+          );
         }
       }
       if (lostCount === 3) {
